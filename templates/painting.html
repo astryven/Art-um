@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}Artéum — {{ p.title }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{{ url_for('explore') }}">← Back to Explore</a>
+
+  <div class="detail-card">
+    <div class="post-head">
+      {{ avatar(p.artist, 34) }}
+      <div class="who-meta">
+        <div class="who"><a href="{{ url_for('profile', username=p.artist.username) }}">{{ p.artist.username }}</a></div>
+        <div class="meta">added {{ p.created_at.strftime('%b %d, %Y') }}{% if p.year %} · painted {{ p.year }}{% endif %}</div>
+      </div>
+    </div>
+
+    <div class="painting-title">{{ p.title }}{% if p.painter_name and p.painter_name != p.artist.username %} <span class="by">— {{ p.painter_name }}</span>{% endif %}</div>
+    {% if p.medium or p.year %}<div class="museum-line">{{ p.medium }}{% if p.year %} · {{ p.year }}{% endif %}</div>{% endif %}
+
+    <div class="artwork">
+      <img src="{{ url_for('static', filename='uploads/' + p.filename) }}" alt="{{ p.title }}">
+    </div>
+
+    {% if p.medium %}<div class="tagrow"><span class="tag">{{ p.medium }}</span></div>{% endif %}
+
+    {% if p.report %}<p class="report" dir="auto" style="white-space:pre-line">{{ p.report }}</p>{% endif %}
+
+    <div class="actions">
+      {% if current_user.is_authenticated %}
+      <form method="post" action="{{ url_for('like_painting', painting_id=p.id) }}">
+        <button class="action-btn {{ 'liked' if p.liked_by(current_user) else '' }}" type="submit">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-8.6C1.2 8.4 2.6 5 6 5c2 0 3.3 1.1 4 2.2C10.7 6.1 12 5 14 5c3.4 0 4.8 3.4 3.3 6.4C19 15.6 12 20 12 20z"/></svg>
+          {{ p.likes|length }}
+        </button>
+      </form>
+      {% else %}
+      <span class="action-btn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-8.6C1.2 8.4 2.6 5 6 5c2 0 3.3 1.1 4 2.2C10.7 6.1 12 5 14 5c3.4 0 4.8 3.4 3.3 6.4C19 15.6 12 20 12 20z"/></svg>{{ p.likes|length }}</span>
+      {% endif %}
+
+      {% if current_user.is_authenticated %}
+      <form method="post" action="{{ url_for('repost_painting', painting_id=p.id) }}">
+        <button class="action-btn {{ 'reposted' if p.is_reposted_by(current_user) else '' }}" type="submit">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M5 15a8 8 0 0 0 14-3"/><path d="M19 9a8 8 0 0 0-14 3"/></svg>
+          {{ p.reposts|length }}
+        </button>
+      </form>
+      {% endif %}
+
+      {% if current_user.is_authenticated and current_user.id == p.user_id %}
+      <form method="post" action="{{ url_for('delete_painting', painting_id=p.id) }}"
+            onsubmit="return confirm('Remove this painting?');" style="margin-left:auto">
+        <button class="del-btn" type="submit">remove</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

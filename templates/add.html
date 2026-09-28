@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Artéum — {{ t('add_title') }}{% endblock %}
+{% block content %}
+  <div class="form-card wide">
+    <div class="form-title">{{ t('add_title') }}</div>
+    <p class="form-sub">{{ t('add_sub') }}</p>
+
+    <form method="post" enctype="multipart/form-data">
+      <div class="field">
+        <label for="title">{{ t('field_title') }}</label>
+        <input type="text" id="title" name="title" placeholder="e.g. Starry Night" required>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label for="painter_name">{{ t('field_painter') }}</label>
+          <input type="text" id="painter_name" name="painter_name" placeholder="e.g. Vincent van Gogh (leave blank if it's yours)">
+        </div>
+        <div class="field">
+          <label for="year">{{ t('field_year') }}</label>
+          <input type="text" id="year" name="year" placeholder="e.g. 1889">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="medium">{{ t('field_medium') }}</label>
+        <input type="text" id="medium" name="medium" placeholder="e.g. Oil on canvas">
+      </div>
+
+      <div class="field">
+        <label for="image">{{ t('field_image') }}</label>
+        <div class="file-picker">
+          <label class="file-btn" for="image">{{ t('choose_image') }}</label>
+          <span class="file-name" id="file-name-txt">{{ t('no_file_chosen') }}</span>
+        </div>
+        <input type="file" id="image" name="image" accept="image/*" required class="file-input"
+               onchange="document.getElementById('file-name-txt').textContent = this.files.length ? this.files[0].name : '{{ t('no_file_chosen') }}'">
+      </div>
+
+      <div class="field">
+        <label for="report">{{ t('field_report') }}</label>
+        <textarea id="report" name="report" placeholder="What is this piece about, what stands out about the technique, brushwork, composition..."></textarea>
+      </div>
+
+      <button class="btn-primary" type="submit">{{ t('btn_add') }}</button>
+    </form>
+  </div>
+{% endblock %}

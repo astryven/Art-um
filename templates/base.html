@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Artéum{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% from "_avatar.html" import avatar %}
+<script>
+(function(){
+  var saved = localStorage.getItem('arteum-theme');
+  if(saved === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+</script>
+</head>
+<body>
+<div class="app {{ 'no-rail' if not show_rail else '' }}">
+
+  <aside class="sidebar">
+    <a class="brandmark" href="{{ url_for('index') }}">
+      <span>Artéum</span>
+      <span class="brand-rule"></span>
+    </a>
+
+    {% if current_user.is_authenticated %}
+    <div class="search-box">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="nav-search" placeholder="{{ t('search_placeholder') }}" autocomplete="off"
+             onkeydown="if(event.key==='Enter'){window.location='{{ url_for('search') }}?q='+encodeURIComponent(this.value)}">
+      <div class="search-drop" id="nav-search-drop"></div>
+    </div>
+    <a class="navlink {{ 'current' if page=='home' else '' }}" href="{{ url_for('index') }}">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
+      <span class="navlabel">{{ t('nav_home') }}</span>
+    </a>
+    <a class="navlink mobile-search-link" href="{{ url_for('search') }}">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    </a>
+    <a class="navlink {{ 'current' if page=='explore' else '' }}" href="{{ url_for('explore') }}">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg>
+      <span class="navlabel">{{ t('nav_explore') }}</span>
+    </a>
+    <a class="navlink {{ 'current' if page=='activity' else '' }}" href="{{ url_for('activity') }}">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      <span class="navlabel">{{ t('nav_activity') }}</span>
+      {% if has_new_activity() %}<span class="nav-dot"></span>{% endif %}
+    </a>
+    <a class="navlink {{ 'current' if page=='messages' else '' }}" href="{{ url_for('messages_inbox') }}">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"/></svg>
+      <span class="navlabel">{{ t('nav_messages') }}</span>
+      {% set uc = unread_message_count() %}
+      {% if uc %}<span class="badge">{{ uc }}</span>{% endif %}
+    </a>
+    <a class="navlink {{ 'current' if page=='gallery' else '' }}" href="{{ url_for('gallery') }}">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>
+      <span class="navlabel">{{ t('nav_gallery') }}</span>
+    </a>
+    <a class="navlink {{ 'current' if page=='profile' else '' }}" href="{{ url_for('profile', username=current_user.username) }}">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+      <span class="navlabel">{{ t('nav_profile') }}</span>
+    </a>
+    <a class="navlink {{ 'current' if page=='settings' else '' }}" href="{{ url_for('settings') }}">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      <span class="navlabel">{{ t('nav_settings') }}</span>
+    </a>
+    {% endif %}
+
+    <div class="nav-spacer"></div>
+
+    <button class="theme-toggle" type="button" onclick="toggleTheme()"
+            data-dark="{{ t('theme_dark') }}" data-light="{{ t('theme_light') }}">
+      <span id="theme-icon">🌙</span><span class="navlabel" id="theme-label">{{ t('theme_dark') }}</span>
+    </button>
+
+    {% if current_user.is_authenticated %}
+    <a class="compose-btn" href="{{ url_for('add') }}">
+      <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;stroke-width:2.2"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="navlabel">{{ t('compose') }}</span>
+    </a>
+    <div class="who-box">
+      {{ avatar(current_user, 32) }}
+      <div class="navlabel">
+        <div class="name">{{ current_user.username }}</div>
+        <a class="out" href="{{ url_for('logout') }}">{{ t('logout') }}</a>
+      </div>
+    </div>
+    {% else %}
+    <a class="compose-btn" href="{{ url_for('signup') }}">
+      <span class="navlabel">{{ t('signup_cta') }}</span>
+    </a>
+    <a class="navlink" href="{{ url_for('login') }}">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+      <span class="navlabel">{{ t('login_cta') }}</span>
+    </a>
+    {% endif %}
+  </aside>
+
+  <main class="main">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if show_rail %}
+  <aside class="rail">
+    <div class="rail-card">
+      <div class="rail-title">{{ t('rail_artists') }}</div>
+      {% for u in suggested %}
+      <div class="rail-user">
+        {{ avatar(u, 30) }}
+        <div><div class="name"><a href="{{ url_for('profile', username=u.username) }}">{{ u.username }}</a></div>
+          <div class="sub">{{ u.paintings|length }} painting{{ 's' if u.paintings|length != 1 else '' }}</div></div>
+        {% if current_user.is_authenticated and u.id != current_user.id %}
+        <form method="post" action="{{ url_for('follow', username=u.username) }}">
+          <button class="rail-follow" type="submit">{{ t('following') if current_user.is_following(u) else t('follow') }}</button>
+        </form>
+        {% endif %}
+      </div>
+      {% else %}<div class="sub">{{ t('rail_no_suggestions') }}</div>{% endfor %}
+    </div>
+    <div class="rail-card">
+      <div class="rail-title">{{ t('rail_trending') }}</div>
+      {% for p in trending %}
+      <div class="rail-mini">
+        <img class="thumb" src="{{ url_for('static', filename='uploads/' + p.filename) }}" alt="">
+        <div><div class="t">{{ p.title }}</div><div class="s">{{ p.likes|length }} like{{ 's' if p.likes|length != 1 else '' }}</div></div>
+      </div>
+      {% else %}<div class="sub">{{ t('rail_no_trending') }}</div>{% endfor %}
+    </div>
+  </aside>
+  {% endif %}
+
+</div>
+
+<script>
+function paintToggle(){
+  var btn = document.querySelector('.theme-toggle');
+  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('theme-icon').textContent = dark ? '☀️' : '🌙';
+  document.getElementById('theme-label').textContent = dark ? btn.dataset.light : btn.dataset.dark;
+}
+function toggleTheme(){
+  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if(dark){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('arteum-theme','light'); }
+  else{ document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('arteum-theme','dark'); }
+  paintToggle();
+}
+paintToggle();
+
+function esc(str){
+  return String(str).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+(function(){
+  var input = document.getElementById('nav-search');
+  if(!input) return;
+  var drop = document.getElementById('nav-search-drop');
+  var timer = null;
+  input.addEventListener('input', function(){
+    clearTimeout(timer);
+    var q = input.value.trim();
+    if(q.length < 2){ drop.classList.remove('show'); drop.innerHTML=''; return; }
+    timer = setTimeout(function(){
+      fetch('{{ url_for("api_search") }}?q=' + encodeURIComponent(q))
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          var rows = [];
+          data.users.forEach(function(u){ rows.push('<a href="'+esc(u.url)+'">👤 '+esc(u.username)+'</a>'); });
+          data.paintings.forEach(function(p){ rows.push('<a href="'+esc(p.url)+'">🖼 '+esc(p.title)+' — '+esc(p.painter_name)+'</a>'); });
+          drop.innerHTML = rows.length ? rows.join('') : '<div class="sd-empty">{{ t("no_results") }}</div>';
+          drop.classList.add('show');
+        });
+    }, 250);
+  });
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.search-box')){ drop.classList.remove('show'); }
+  });
+})();
+</script>
+</body>
+</html>

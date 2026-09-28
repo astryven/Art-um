@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+arteum.db
+.secret_key
+static/uploads/*
+!static/uploads/starry_night.png

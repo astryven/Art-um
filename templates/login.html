@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Artéum — {{ t('login_title') }}{% endblock %}
+{% block content %}
+  <div class="form-wrap">
+    <div class="lang-switch">
+      <a href="{{ url_for('set_language', lang_code='en') }}" class="{{ 'active' if lang=='en' else '' }}">English</a>
+      <span>·</span>
+      <a href="{{ url_for('set_language', lang_code='ar') }}" class="{{ 'active' if lang=='ar' else '' }}">العربية</a>
+    </div>
+    <div class="form-card">
+      <div class="form-title">{{ t('login_title') }}</div>
+      <p class="form-sub">{{ t('login_sub') }}</p>
+      <form method="post">
+        <div class="field">
+          <label for="identifier">{{ t('field_identifier') }}</label>
+          <input type="text" id="identifier" name="identifier" required autofocus>
+        </div>
+        <div class="field">
+          <label for="password">{{ t('field_password') }}</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button class="btn-primary" type="submit">{{ t('btn_login') }}</button>
+      </form>
+      <div class="form-foot">{{ t('new_to_arteum') }} <a href="{{ url_for('signup') }}">{{ t('create_account') }}</a></div>
+    </div>
+  </div>
+{% endblock %}

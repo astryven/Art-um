@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}Artéum — {{ t('messages_title') }}{% endblock %}
+{% block content %}
+  <div class="page-title">{{ t('messages_title') }}</div>
+  <p class="page-sub">{{ t('messages_sub') }}</p>
+
+  {% if not partners %}
+    <div class="empty">{{ t('no_conversations') }}</div>
+  {% endif %}
+
+  {% for row in partners %}
+    <a class="convo-row" href="{{ url_for('messages_thread', username=row.user.username) }}">
+      {{ avatar(row.user, 40) }}
+      <div class="convo-body">
+        <div class="convo-top">
+          <span class="convo-name">{{ row.user.username }}</span>
+          <span class="convo-time">{{ row.last.created_at.strftime('%b %d') }}</span>
+        </div>
+        <div class="convo-snippet" dir="auto">{{ row.last.body|truncate(80) if row.last.body else t('photo_label') }}</div>
+      </div>
+      {% if row.unread %}<span class="badge">{{ row.unread }}</span>{% endif %}
+    </a>
+  {% endfor %}
+{% endblock %}

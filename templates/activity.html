@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}Artéum — {{ t('activity_title') }}{% endblock %}
+{% block content %}
+  <div class="page-title">{{ t('activity_title') }}</div>
+  <p class="page-sub">{{ t('activity_sub') }}</p>
+
+  {% if not items %}
+    <div class="empty">{{ t('no_activity') }}</div>
+  {% endif %}
+
+  {% for i in items %}
+    <a class="convo-row" href="{{ url_for('profile', username=i.actor.username) }}">
+      {{ avatar(i.actor, 40) }}
+      <div class="convo-body">
+        <div class="convo-top">
+          <span class="convo-name">{{ i.actor.username }}
+            <span style="font-weight:400;color:var(--sub)">
+              {{ t('act_liked') if i.kind=='like' else (t('act_reposted') if i.kind=='repost' else t('act_followed')) }}
+            </span>
+          </span>
+          {% if i.created_at %}<span class="convo-time">{{ i.created_at.strftime('%b %d') }}</span>{% endif %}
+        </div>
+        {% if i.painting %}<div class="convo-snippet">{{ i.painting.title }}</div>{% endif %}
+      </div>
+      {% if i.painting %}
+      <img src="{{ url_for('static', filename='uploads/' + i.painting.filename) }}" alt=""
+           style="width:40px;height:40px;object-fit:cover;border-radius:8px;flex:0 0 auto">
+      {% endif %}
+    </a>
+  {% endfor %}
+{% endblock %}

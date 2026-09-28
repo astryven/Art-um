@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}Artéum — {{ t('search_title') }}{% endblock %}
+{% block content %}
+  <div class="page-title">{{ t('search_title') }}</div>
+  {% if q %}<p class="page-sub">{{ t('search_sub') }} "{{ q }}"</p>{% endif %}
+
+  {% if q and not users and not paintings %}
+    <div class="empty">{{ t('no_results') }}</div>
+  {% endif %}
+
+  {% if users %}
+    <div class="rail-title" style="margin:6px 0 12px">{{ t('nav_profile') }}</div>
+    {% for u in users %}
+      <a class="convo-row" href="{{ url_for('profile', username=u.username) }}">
+        {{ avatar(u, 40) }}
+        <div class="convo-body"><div class="convo-name">{{ u.username }}</div></div>
+      </a>
+    {% endfor %}
+  {% endif %}
+
+  {% if paintings %}
+    <div class="rail-title" style="margin:22px 0 12px">{{ t('nav_gallery') }}</div>
+    {% for p in paintings %}
+      <a class="convo-row" href="{{ url_for('painting_detail', painting_id=p.id) }}">
+        <img src="{{ url_for('static', filename='uploads/' + p.filename) }}" alt=""
+             style="width:44px;height:32px;object-fit:cover;border-radius:6px;flex:0 0 auto">
+        <div class="convo-body">
+          <div class="convo-name">{{ p.title }}</div>
+          <div class="convo-snippet">{{ p.painter_name }}</div>
+        </div>
+      </a>
+    {% endfor %}
+  {% endif %}
+{% endblock %}

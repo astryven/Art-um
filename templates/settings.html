@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Artéum — {{ t('settings_title') }}{% endblock %}
+{% block content %}
+  <div class="page-title">{{ t('settings_title') }}</div>
+  <p class="page-sub">{{ t('settings_sub') }}</p>
+
+  <div class="form-card wide">
+    <form method="post">
+      <div class="field">
+        <label>{{ t('field_language') }}</label>
+        <div class="lang-options">
+          <label class="lang-option {{ 'checked' if lang=='en' else '' }}">
+            <input type="radio" name="language" value="en" {{ 'checked' if lang=='en' else '' }}>
+            English
+          </label>
+          <label class="lang-option {{ 'checked' if lang=='ar' else '' }}">
+            <input type="radio" name="language" value="ar" {{ 'checked' if lang=='ar' else '' }}>
+            العربية
+          </label>
+        </div>
+      </div>
+      <button class="btn-primary" type="submit" style="max-width:200px">{{ t('btn_save') }}</button>
+    </form>
+  </div>
+{% endblock %}

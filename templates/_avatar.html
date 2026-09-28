@@ -1,0 +1,8 @@
+{% macro avatar(user, size=34) %}
+  {% if user.avatar_filename %}
+    <img class="avatar" style="width:{{ size }}px;height:{{ size }}px;object-fit:cover"
+         src="{{ url_for('static', filename='uploads/' + user.avatar_filename) }}" alt="{{ user.username }}">
+  {% else %}
+    <div class="avatar" style="width:{{ size }}px;height:{{ size }}px;font-size:{{ (size*0.4)|round|int }}px;background:{{ user.avatar_color }}">{{ user.username[0]|upper }}</div>
+  {% endif %}
+{% endmacro %}

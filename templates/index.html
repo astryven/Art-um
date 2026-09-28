@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}Artéum — {{ t('home_title') if page=='home' else (t('explore_title') if page=='explore' else t('gallery_title')) }}{% endblock %}
+{% block content %}
+  {% if page == 'home' %}
+    <div class="page-title">{{ t('home_title') }}</div>
+    <p class="page-sub">{{ t('home_sub') }}</p>
+  {% elif page == 'explore' %}
+    <div class="page-title">{{ t('explore_title') }}</div>
+    <p class="page-sub">{{ t('explore_sub') }}</p>
+  {% else %}
+    <div class="page-title">{{ t('gallery_title') }}</div>
+    <p class="page-sub">{{ t('gallery_sub') }}</p>
+  {% endif %}
+
+  {% if not items %}
+    <div class="empty">
+      {% if page == 'home' %}
+        <a href="{{ url_for('explore') }}">{{ t('empty_home') }}</a>
+      {% elif page == 'gallery' %}
+        <a href="{{ url_for('add') }}">{{ t('empty_gallery') }}</a>
+      {% else %}
+        {{ t('empty_explore') }}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% for item in items %}
+    {% set p = item.painting %}
+    {% set reposted_by = item.reposted_by %}
+    {% include "_painting_card.html" %}
+    {% if loop.index == 2 and page in ['home', 'explore'] and suggested %}
+      <div class="mid-follow">
+        <div class="mid-follow-title">{{ t('mid_follow_title') }}</div>
+        <div class="mid-follow-row">
+          {% for u in suggested %}
+          <div class="mid-follow-card">
+            {{ avatar(u, 56) }}
+            <div class="mid-follow-name"><a href="{{ url_for('profile', username=u.username) }}">{{ u.username }}</a></div>
+            {% if current_user.is_authenticated and u.id != current_user.id %}
+            <form method="post" action="{{ url_for('follow', username=u.username) }}">
+              <button class="mid-follow-btn {{ 'following' if current_user.is_following(u) else '' }}" type="submit">
+                {{ t('following') if current_user.is_following(u) else t('follow') }}
+              </button>
+            </form>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endblock %}

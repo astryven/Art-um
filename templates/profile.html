@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "_avatar.html" import avatar %}
+{% block title %}Artéum — {{ profile_user.username }}{% endblock %}
+{% block content %}
+  <div class="profile-cover"></div>
+
+  <div class="profile-head">
+    <div class="avatar-wrap">
+      {{ avatar(profile_user, 84) }}
+      {% if current_user.is_authenticated and current_user.id == profile_user.id %}
+      <form method="post" action="{{ url_for('update_avatar') }}" enctype="multipart/form-data" id="avatarForm">
+        <label class="avatar-edit" for="avatarInput" title="Change photo">✎</label>
+        <input type="file" id="avatarInput" name="avatar" accept="image/*" class="file-input"
+               onchange="document.getElementById('avatarForm').submit()">
+      </form>
+      {% endif %}
+    </div>
+
+    {% if current_user.is_authenticated and current_user.id != profile_user.id %}
+    <div class="profile-actions">
+      <a class="profile-message" href="{{ url_for('messages_thread', username=profile_user.username) }}">{{ t('message_btn') }}</a>
+      <form method="post" action="{{ url_for('follow', username=profile_user.username) }}">
+        <button class="profile-follow {{ 'following' if current_user.is_following(profile_user) else '' }}" type="submit">
+          {{ t('following') if current_user.is_following(profile_user) else t('follow') }}
+        </button>
+      </form>
+    </div>
+    {% elif current_user.is_authenticated and current_user.id == profile_user.id %}
+    <div class="profile-actions">
+      <a class="profile-edit" href="{{ url_for('settings') }}">{{ t('nav_settings') }}</a>
+      <a class="profile-edit" href="{{ url_for('logout') }}">{{ t('logout') }}</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="profile-name">{{ profile_user.username }}</div>
+  <div class="profile-handle">@{{ profile_user.username }}</div>
+  <div class="profile-stats">
+    <span><b>{{ painting_count }}</b> {{ t('tab_posts')|lower }}</span>
+    <span><b>{{ follower_count }}</b> {{ t('followers_label') }}</span>
+    <span><b>{{ following_count }}</b> {{ t('tab_following')|lower }}</span>
+  </div>
+
+  <div class="profile-tabs">
+    <a class="profile-tab {{ 'active' if tab=='posts' else '' }}" href="?tab=posts">{{ t('tab_posts') }}</a>
+    <a class="profile-tab {{ 'active' if tab=='likes' else '' }}" href="?tab=likes">{{ t('tab_likes') }}</a>
+    <a class="profile-tab {{ 'active' if tab=='following' else '' }}" href="?tab=following">{{ t('tab_following') }}</a>
+  </div>
+
+  {% if tab == 'posts' and current_user.is_authenticated and current_user.id == profile_user.id %}
+    <a class="composer-link" href="{{ url_for('add') }}">
+      {{ avatar(current_user, 34) }}
+      {{ t('share_painting') }}
+    </a>
+  {% endif %}
+
+  {% if tab == 'following' %}
+    {% if not following_users %}
+      <div class="empty">{{ t('no_following_yet') }}</div>
+    {% endif %}
+    {% for u in following_users %}
+      <a class="following-user" href="{{ url_for('profile', username=u.username) }}">
+        {{ avatar(u, 36) }}
+        <div class="name">{{ u.username }}</div>
+      </a>
+    {% endfor %}
+  {% else %}
+    {% if not items %}
+      <div class="empty">{{ t('no_likes_yet') if tab=='likes' else t('nothing_posted') }}</div>
+    {% endif %}
+    {% for item in items %}
+      {% set p = item.painting %}
+      {% set reposted_by = item.reposted_by %}
+      {% include "_painting_card.html" %}
+    {% endfor %}
+  {% endif %}
+{% endblock %}
